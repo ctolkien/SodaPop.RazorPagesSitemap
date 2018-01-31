@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ namespace SodaPop.RazorPagesSitemap
             }
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var baseDomain = context.Request.Scheme + "://" + context.Request.Host + "/";
 
@@ -70,15 +69,9 @@ namespace SodaPop.RazorPagesSitemap
             context.Response.Headers.Add("Content-Type", "application/xml");
 
             var serializer = new XmlSerializer(typeof(Sitemap));
-            using (var ms = new MemoryStream())
-            using (var sr = new StreamReader(ms))
-            {
-                serializer.Serialize(ms, sitemap);
-                ms.Position = 0;
+            serializer.Serialize(context.Response.Body, sitemap);
 
-                var xmlAsString = await sr.ReadToEndAsync();
-                await context.Response.WriteAsync(xmlAsString);
-            }
+            return Task.CompletedTask;
         }
     }
 }
