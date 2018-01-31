@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Chad Tolkien</Authors>
+    <Company>Soda Digital</Company>
+    <PackageProjectUrl>https://github.com/ctolkien/SodaPop.RazorPagesSitemap</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ctolkien/SodaPop.RazorPagesSitemap</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
