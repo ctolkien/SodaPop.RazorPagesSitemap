@@ -14,12 +14,15 @@ namespace SodaPop.RazorPagesSitemap
 
         public static IServiceCollection AddRazorPagesSitemap(this IServiceCollection services)
         {
-            return services.AddRazorPagesSitemap(_ => new RazorPagesSitemapOptions());
+            return services.AddRazorPagesSitemap(setupAction: null);
         }
 
         public static IServiceCollection AddRazorPagesSitemap(this IServiceCollection services, Action<RazorPagesSitemapOptions> setupAction)
         {
-            services.Configure(setupAction);
+            if (setupAction != null)
+            {
+                services.Configure(setupAction);
+            }
             services.AddTransient<RazorPagesSitemapMiddleware>();
 
             return services;

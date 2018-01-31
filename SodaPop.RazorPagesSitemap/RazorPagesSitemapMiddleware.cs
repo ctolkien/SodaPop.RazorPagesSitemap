@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -32,15 +31,14 @@ namespace SodaPop.RazorPagesSitemap
             }
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var baseDomain = context.Request.Scheme + "://" + context.Request.Host + "/";
 
-            var sitemap = new Sitemap();
-
             var nodes = new List<SitemapNode>();
 
-            foreach (PageActionDescriptor page in _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor))
+            var pages = _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor);
+            foreach (PageActionDescriptor page in pages)
             {
                 if (_options.IgnorePathsEndingInIndex && page.ViewEnginePath.EndsWith("/index"))
                 {
@@ -65,22 +63,17 @@ namespace SodaPop.RazorPagesSitemap
                 nodes.Add(node);
             }
 
-            sitemap.Nodes = nodes;
+            var sitemap = new Sitemap()
+            {
+                Nodes = nodes
+            };
 
-            context.Response.Headers.Add("Content-Type", "application/xml");
+            context.Response.ContentType = "application/xml";
 
             var serializer = new XmlSerializer(typeof(Sitemap));
-            using (var ms = new MemoryStream())
-            using (var sr = new StreamReader(ms))
-            {
-                serializer.Serialize(ms, sitemap);
-                ms.Position = 0;
+            serializer.Serialize(context.Response.Body, sitemap);
 
-                var xmlAsString = await sr.ReadToEndAsync();
-                await context.Response.WriteAsync(xmlAsString);
-            }
-
-            await next(context);
+            return Task.CompletedTask;
         }
     }
 }
