@@ -35,11 +35,10 @@ namespace SodaPop.RazorPagesSitemap
         {
             var baseDomain = context.Request.Scheme + "://" + context.Request.Host + "/";
 
-            var sitemap = new Sitemap();
-
             var nodes = new List<SitemapNode>();
 
-            foreach (PageActionDescriptor page in _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor))
+            var pages = _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor);
+            foreach (PageActionDescriptor page in pages)
             {
                 if (_options.IgnorePathsEndingInIndex && page.ViewEnginePath.EndsWith("/index"))
                 {
@@ -64,9 +63,12 @@ namespace SodaPop.RazorPagesSitemap
                 nodes.Add(node);
             }
 
-            sitemap.Nodes = nodes;
+            var sitemap = new Sitemap()
+            {
+                Nodes = nodes
+            };
 
-            context.Response.Headers.Add("Content-Type", "application/xml");
+            context.Response.ContentType = "application/xml";
 
             var serializer = new XmlSerializer(typeof(Sitemap));
             serializer.Serialize(context.Response.Body, sitemap);
