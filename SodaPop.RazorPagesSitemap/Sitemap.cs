@@ -41,6 +41,7 @@ namespace SodaPop.RazorPagesSitemap
 
             if (LastModified.HasValue)
             {
+                //https://www.sitemaps.org/protocol.html
                 //https://www.w3.org/TR/NOTE-datetime
                 writer.WriteElementString("lastmod", LastModified.Value.ToString("yyyy-MM-ddTHH:mmZ"));
             }

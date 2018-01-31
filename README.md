@@ -5,7 +5,7 @@ Generates a sitemap based on the layout of your Razor Pages website.
 ## Install
 
 ```
-dotnet install package SodaPop.RazorPagesSitemap
+dotnet add package SodaPop.RazorPagesSitemap
 ```
 
 ## Setup
