@@ -79,8 +79,6 @@ namespace SodaPop.RazorPagesSitemap
                 var xmlAsString = await sr.ReadToEndAsync();
                 await context.Response.WriteAsync(xmlAsString);
             }
-
-            await next(context);
         }
     }
 }
