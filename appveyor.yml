@@ -28,7 +28,7 @@ before_build:
 - dotnet --info
 - dotnet restore
 build_script:
-- dotnet build -c %CONFIGURATION% --version-suffix
+- dotnet build -c %CONFIGURATION%
 artifacts:
 - path: .\SodaPop.RazorPagesSitemap\**\*.nupkg
 deploy:
