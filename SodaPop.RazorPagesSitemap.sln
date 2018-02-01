@@ -8,13 +8,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B6F4CF8E-2DCD-435D-8222-47B444922DD9}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SodaPop.RazorPagesSitemap.Sample", "SodaPop.RazorPagesSitemap.Sample\SodaPop.RazorPagesSitemap.Sample.csproj", "{A13BA9A7-A403-4A54-B100-A503FE55F39E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SodaPop.RazorPagesSitemap.Sample", "SodaPop.RazorPagesSitemap.Sample\SodaPop.RazorPagesSitemap.Sample.csproj", "{A13BA9A7-A403-4A54-B100-A503FE55F39E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SodaPop.RazorPagesSitemap.Tests", "SodaPop.RazorPagesSitemap.Tests\SodaPop.RazorPagesSitemap.Tests.csproj", "{BBD5AF26-B26B-4E11-8D47-83BDA0659C11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SodaPop.RazorPagesSitemap.Tests", "SodaPop.RazorPagesSitemap.Tests\SodaPop.RazorPagesSitemap.Tests.csproj", "{BBD5AF26-B26B-4E11-8D47-83BDA0659C11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
