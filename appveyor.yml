@@ -22,7 +22,7 @@ before_build:
 build_script:
 - dotnet build -c %CONFIGURATION%
 artifacts:
-- path: .\**\*.nupkg
+- path: .\SodaPop.RazorPagesSitemap\**\*.nupkg
 deploy:
 - provider: NuGet
   api_key:
