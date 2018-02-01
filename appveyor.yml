@@ -39,7 +39,7 @@ deploy:
   artifact: /.*\.nupkg/
   on:
     TaggedForRelease: true
-    TaggedForPreRelease : false
+    #TaggedForPreRelease : false
 - provider: GitHub
   release: $(APPVEYOR_REPO_TAG_NAME)
   prerelease: $(TaggedForPreRelease)
