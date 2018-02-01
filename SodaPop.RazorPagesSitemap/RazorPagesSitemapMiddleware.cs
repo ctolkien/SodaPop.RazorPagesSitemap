@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -40,7 +41,7 @@ namespace SodaPop.RazorPagesSitemap
             var pages = _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor);
             foreach (PageActionDescriptor page in pages)
             {
-                if (_options.IgnorePathsEndingInIndex && page.ViewEnginePath.EndsWith("/index"))
+                if (_options.IgnorePathsEndingInIndex && page.ViewEnginePath.EndsWith("/index", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
