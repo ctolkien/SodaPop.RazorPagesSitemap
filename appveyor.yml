@@ -16,11 +16,19 @@ init:
         Add-AppveyorMessage "Tagged For $($relName): $($env:APPVEYOR_REPO_TAG_NAME)" -details $env:APPVEYOR_REPO_COMMIT
         Update-AppveyorBuild -Version "$env:APPVEYOR_REPO_TAG_NAME".Substring(1)
     }
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
 before_build:
 - dotnet --info
 - dotnet restore
 build_script:
-- dotnet build -c %CONFIGURATION%
+- dotnet build -c %CONFIGURATION% --version-suffix
 artifacts:
 - path: .\SodaPop.RazorPagesSitemap\**\*.nupkg
 deploy:
