@@ -41,7 +41,7 @@ namespace SodaPop.RazorPagesSitemap
             var pages = _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor);
             foreach (PageActionDescriptor page in pages)
             {
-                if (_options.IgnorePathsEndingInIndex && page.ViewEnginePath.EndsWith("/index", StringComparison.OrdinalIgnoreCase))
+                if (_options.IgnorePathsEndingInIndex && page.AttributeRouteInfo.Template.EndsWith("index", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
