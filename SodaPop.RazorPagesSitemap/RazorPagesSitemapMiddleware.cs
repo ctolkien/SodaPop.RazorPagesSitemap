@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.Language;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,13 @@ namespace SodaPop.RazorPagesSitemap
         private readonly RazorProject _razorProject;
         private readonly RazorPagesSitemapOptions _options;
         private readonly Regex _ignoreExpression;
+        private readonly LinkGenerator _linkGenerator;
 
-        public RazorPagesSitemapMiddleware(IActionDescriptorCollectionProvider actionDescriptors, RazorProject razorProject, IOptions<RazorPagesSitemapOptions> options)
+        public RazorPagesSitemapMiddleware(
+            IActionDescriptorCollectionProvider actionDescriptors,
+            RazorProject razorProject,
+            IOptions<RazorPagesSitemapOptions> options,
+            LinkGenerator linkGenerator)
         {
             _actionDescriptorCollectionProvider = actionDescriptors;
             _razorProject = razorProject;
@@ -30,11 +36,13 @@ namespace SodaPop.RazorPagesSitemap
             {
                 _ignoreExpression = new Regex(_options.IgnoreExpression, RegexOptions.Compiled);
             }
+
+            _linkGenerator = linkGenerator;
         }
 
         public Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var baseDomain = context.Request.Scheme + "://" + context.Request.Host + "/";
+            var baseDomain = context.Request.Scheme + "://" + context.Request.Host;
 
             var nodes = new List<SitemapNode>();
 
@@ -51,7 +59,7 @@ namespace SodaPop.RazorPagesSitemap
                     continue;
                 }
 
-                var node = new SitemapNode(baseDomain + page.AttributeRouteInfo.Template);
+                var node = new SitemapNode(baseDomain + _linkGenerator.GetPathByPage(page.ViewEnginePath));
 
                 if (_options.BaseLastModOnLastModifiedTimeOnDisk)
                 {
