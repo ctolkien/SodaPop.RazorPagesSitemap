@@ -9,11 +9,11 @@
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>
       1.0 - Initial release
-      2.0 - ASPNET Core 2.2
+      2.0 - ASPNET Core 2.2. Uses new `LinkGenerator` service, so it now correctly uses the options from routing (e.g, will match the casing correctly)
     </PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
-    <PackageVersion>1.0.0</PackageVersion>
+    <Version>2.0.0</Version>
+    <PackageVersion>2.0.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
