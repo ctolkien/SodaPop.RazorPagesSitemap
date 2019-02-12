@@ -25,6 +25,9 @@ namespace SodaPop.RazorPagesSitemap.Sample
             {
                 options.LowercaseUrls = true;
             });
+
+            services.AddRazorPagesSitemap();
+
             services.AddMvc();
         }
 
