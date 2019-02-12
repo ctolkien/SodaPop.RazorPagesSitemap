@@ -47,7 +47,7 @@ namespace SodaPop.RazorPagesSitemap
         {
             var baseDomain = context.Request.Scheme + "://" + context.Request.Host;
 
-            var nodes = new List<SitemapNode>();
+            var nodes = new HashSet<SitemapNode>();
 
             var pages = _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor);
             foreach (PageActionDescriptor page in pages)
@@ -94,14 +94,15 @@ namespace SodaPop.RazorPagesSitemap
                     }
                 }
 
-                nodes.AddRange(newNodes);
+                foreach (var node in newNodes)
+                {
+                    nodes.Add(node);
+                }
             }
-
-            nodes = nodes.Distinct(new SiteMapNodeComparer()).ToList();
 
             var sitemap = new Sitemap()
             {
-                Nodes = nodes
+                Nodes = nodes.ToList()
             };
 
             context.Response.ContentType = "application/xml";
