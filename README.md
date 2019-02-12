@@ -49,3 +49,48 @@ By default, the sitemap will be available at `/sitemap.xml`. You can customize t
 ```csharp
 app.UseRazorPagesSitemap("/myAlternatePath");
 ```
+
+## Handling Dynamic Page Routes
+
+For Razor Pages which work against dynamic route parameters, you can implement `ISitemapRouteParamProvider` to supply the appriopriate route parameters to generates sitemap nodes. This scenario is useful if you content is generated from a database.
+
+### Example
+
+```csharp
+    public class ProductSitemapProvider : ISitemapRouteParamProvider
+    {
+        private readonly MyProductsDatabase _context;
+
+        public class ProductSitemapProvider(MyProductsDatabase context)
+        {
+            _context = context;
+        }
+
+        public Task<bool> CanSupplyParamsForPageAsync(string pagePath)
+        {
+            return Task.FromResult(pagePath == "/Products");
+        }
+
+        public async Task<IEnumerable<object>> GetRouteParamsAsync()
+        {
+            var products = await _context.Products.ToListAsync();
+
+            var routeParams = new List<object>();
+            foreach(var product in products)
+            {
+                //given a `@page /products/{id}/{slug}`
+                routeParams.Add(new { id = product.Id, slug = product.Slug  });
+            }
+
+            return await Task.FromResult<IEnumerable<object>>(routeParams);
+        }
+    }
+```
+
+Then register this in `Startup`
+
+```csharp
+services.AddTransient<ISitemapRouteParamProvider, ProductsSitemapProvider>();
+```
+
+
