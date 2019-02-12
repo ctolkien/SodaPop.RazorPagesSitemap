@@ -82,7 +82,7 @@ For Razor Pages which work against dynamic route parameters, you can implement `
                 routeParams.Add(new { id = product.Id, slug = product.Slug  });
             }
 
-            return await Task.FromResult<IEnumerable<object>>(routeParams);
+            return routeParams;
         }
     }
 ```
