@@ -19,6 +19,7 @@ namespace SodaPop.RazorPagesSitemap
         private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
         private readonly RazorProject _razorProject;
         private readonly RazorPagesSitemapOptions _options;
+        private readonly IEnumerable<ISitemapRouteParamProvider> _routeParamProviders;
         private readonly Regex _ignoreExpression;
         private readonly LinkGenerator _linkGenerator;
 
@@ -26,11 +27,13 @@ namespace SodaPop.RazorPagesSitemap
             IActionDescriptorCollectionProvider actionDescriptors,
             RazorProject razorProject,
             IOptions<RazorPagesSitemapOptions> options,
+            IEnumerable<ISitemapRouteParamProvider> routeParamProviders,
             LinkGenerator linkGenerator)
         {
             _actionDescriptorCollectionProvider = actionDescriptors;
             _razorProject = razorProject;
             _options = options.Value;
+            _routeParamProviders = routeParamProviders;
 
             if (!string.IsNullOrEmpty(_options.IgnoreExpression))
             {
@@ -40,11 +43,11 @@ namespace SodaPop.RazorPagesSitemap
             _linkGenerator = linkGenerator;
         }
 
-        public Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var baseDomain = context.Request.Scheme + "://" + context.Request.Host;
 
-            var nodes = new List<SitemapNode>();
+            var nodes = new HashSet<SitemapNode>();
 
             var pages = _actionDescriptorCollectionProvider.ActionDescriptors.Items.Where(x => x is PageActionDescriptor);
             foreach (PageActionDescriptor page in pages)
@@ -59,30 +62,53 @@ namespace SodaPop.RazorPagesSitemap
                     continue;
                 }
 
-                var node = new SitemapNode(baseDomain + _linkGenerator.GetPathByPage(page.ViewEnginePath));
+                var newNodes = new List<SitemapNode>();
 
-                if (_options.BaseLastModOnLastModifiedTimeOnDisk)
+                // add any dynamic nodes
+                foreach(var provider in _routeParamProviders)
                 {
-                    if (_razorProject.GetItem(page.RelativePath) is FileProviderRazorProjectItem rpi)
-                    {
-                        node.LastModified = rpi.FileInfo.LastModified.ToUniversalTime().DateTime;
+                    if (await provider.CanSupplyParamsForPageAsync(page.ViewEnginePath)) {
+                        foreach (var routeParams in await provider.GetRouteParamsAsync())
+                        {
+                            var node = new SitemapNode(baseDomain + _linkGenerator.GetPathByPage(page.ViewEnginePath, null, routeParams));
+                            newNodes.Add(node);
+                        }
                     }
                 }
 
-                nodes.Add(node);
+                // add node if we didn't add any dynamic ones
+                if (newNodes.Count == 0)
+                {
+                    var node = new SitemapNode(baseDomain + _linkGenerator.GetPathByPage(page.ViewEnginePath));
+                    newNodes.Add(node);
+                }
+
+                foreach (var node in nodes)
+                {
+                    if (_options.BaseLastModOnLastModifiedTimeOnDisk)
+                    {
+                        if (_razorProject.GetItem(page.RelativePath) is FileProviderRazorProjectItem rpi)
+                        {
+                            node.LastModified = rpi.FileInfo.LastModified.ToUniversalTime().DateTime;
+                        }
+                    }
+                }
+
+                foreach (var node in newNodes)
+                {
+                    nodes.Add(node);
+                }
             }
 
             var sitemap = new Sitemap()
             {
-                Nodes = nodes
+                Nodes = nodes.ToList()
             };
 
             context.Response.ContentType = "application/xml";
 
             var serializer = new XmlSerializer(typeof(Sitemap));
             serializer.Serialize(context.Response.Body, sitemap);
-
-            return Task.CompletedTask;
         }
     }
 }

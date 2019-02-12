@@ -26,8 +26,10 @@ namespace SodaPop.RazorPagesSitemap.Sample
                 options.LowercaseUrls = true;
             });
 
+            services.AddTransient<ISitemapRouteParamProvider, DynamicPageSiteMapRouteParamProvider>();
+          
             services.AddRazorPagesSitemap();
-
+          
             services.AddMvc();
         }
 

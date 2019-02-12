@@ -57,6 +57,11 @@ namespace SodaPop.RazorPagesSitemap
             }
         }
 
+        public override int GetHashCode()
+        {
+            return Url.GetHashCode();
+        }
+
         /// <summary>
         /// Defines the volatility of content tracked via a sitemap node
         /// <seealso href="http://www.volume9inc.com/2009/03/15/sitemap-xml-why-changefreq-priority-are-important/" />
@@ -72,6 +77,4 @@ namespace SodaPop.RazorPagesSitemap
             Always
         }
     }
-
-
 }
