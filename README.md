@@ -52,7 +52,7 @@ app.UseRazorPagesSitemap("/myAlternatePath");
 
 ## Handling Dynamic Page Routes
 
-For Razor Pages which work against dynamic route parameters, you can implement `ISitemapRouteParamProvider` to supply the appriopriate route parameters to generates sitemap nodes. This scenario is useful if you content is generated from a database.
+For Razor Pages which work against dynamic route parameters, you can implement `ISitemapRouteParamProvider` to supply the appropriate route parameters to generates sitemap nodes. This scenario is useful if you content is generated from a database.
 
 ### Example
 
