@@ -27,9 +27,12 @@ namespace SodaPop.RazorPagesSitemap.Sample
             });
 
             services.AddTransient<ISitemapRouteParamProvider, DynamicPageSiteMapRouteParamProvider>();
-          
-            services.AddRazorPagesSitemap();
-          
+
+            services.AddRazorPagesSitemap(options =>
+            {
+                options.IgnoreExpression = @"^\/Error";
+            });
+
             services.AddMvc();
         }
 

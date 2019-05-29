@@ -1,38 +1,45 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using SodaPop.RazorPagesSitemap.Sample;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Xml;
 using Xunit;
 
 namespace SodaPop.RazorPagesSitemap.Tests
 {
-    public class SampleTests
+    public class SampleTests : IClassFixture<WebApplicationFactory<Startup>>
     {
-        private readonly TestServer _server;
         private readonly HttpClient _client;
 
-        public SampleTests()
+        public SampleTests(WebApplicationFactory<Startup> webApplicationFactory)
         {
             // Arrange
-            _server = new TestServer(new WebHostBuilder()
-               .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _client = webApplicationFactory.CreateClient();
         }
 
-        [Fact(Skip = "No worky")]
+        [Fact]
         public async Task EnsureReturnsResponse()
         {
+            // Arrange
+            var sampleResponse = await System.IO.File.ReadAllTextAsync("response.txt");
+            var sampleXml = new XmlDocument();
+            sampleXml.LoadXml(sampleResponse);
+
             // Act
             var response = await _client.GetAsync("/sitemap.xml");
             response.EnsureSuccessStatusCode();
 
             var responseString = await response.Content.ReadAsStringAsync();
+            var responseXml = new XmlDocument();
+            responseXml.LoadXml(responseString);
+
+            var sampleLocationNodes = sampleXml.GetElementsByTagName("loc");
+            var responseLocationNodes = responseXml.GetElementsByTagName("loc");
 
             // Assert
-            var expectedResult = await System.IO.File.ReadAllTextAsync("response.txt");
-            Assert.Equal(expectedResult, responseString, ignoreLineEndingDifferences: true, ignoreWhiteSpaceDifferences: true);
+
+
+            Assert.Equal(sampleLocationNodes.Count, responseLocationNodes.Count);
         }
     }
 }

@@ -17,6 +17,8 @@ namespace SodaPop.RazorPagesSitemap
     {
         public SitemapNode(string url)
         {
+            if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
+
             Url = new Uri(url);
         }
 
@@ -51,16 +53,13 @@ namespace SodaPop.RazorPagesSitemap
                 writer.WriteElementString("changefreq", Frequency.Value.ToString().ToLower()); //bad hack
             }
 
-            if (Priority != default(double))
+            if (Priority != default)
             {
                 writer.WriteElementString("priority", Priority.ToString());
             }
         }
 
-        public override int GetHashCode()
-        {
-            return Url.GetHashCode();
-        }
+        public override int GetHashCode() => Url.GetHashCode();
 
         /// <summary>
         /// Defines the volatility of content tracked via a sitemap node
