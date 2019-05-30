@@ -37,7 +37,7 @@ namespace SodaPop.RazorPagesSitemap
 
             if (!string.IsNullOrEmpty(_options.IgnoreExpression))
             {
-                _ignoreExpression = new Regex(_options.IgnoreExpression, RegexOptions.Compiled);
+                _ignoreExpression = new Regex(_options.IgnoreExpression, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
 
             _linkGenerator = linkGenerator;
