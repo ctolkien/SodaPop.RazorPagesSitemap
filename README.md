@@ -4,7 +4,7 @@ Generates a sitemap based on the layout of your Razor Pages website.
 
 ### Status
 
-[![Build status](https://ci.appveyor.com/api/projects/status/vgyismfpwlvny8gq/branch/master?svg=true)](https://ci.appveyor.com/project/Soda-Digital/sodapop-razorpagessitemap/branch/master)
+[![Build Status](https://dev.azure.com/chadtolkien/RazorPagesSitemap/_apis/build/status/ctolkien.SodaPop.RazorPagesSitemap?branchName=master)](https://dev.azure.com/chadtolkien/RazorPagesSitemap/_build/latest?definitionId=1&branchName=master)
 
 ## Install
 

@@ -4,14 +4,55 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-latest'
+  - master
+pr:
+  - master
 
 variables:
   buildConfiguration: 'Release'
 
-steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+stages:
+  - stage: "Prepare"  
+    displayName: "Build and test"
+    jobs:
+      - job: "Build"
+        strategy:
+          matrix:
+            Linux:
+              imageName: 'ubuntu-latest'
+            Windows:
+              imageName: 'windows-latest'
+        steps:
+          - script: dotnet build --configuration $(buildConfiguration)
+            displayName: 'dotnet build $(buildConfiguration)'
+          - script: dotnet test -v n --configuration $(buildConfiguration) -l trx
+            displayName: 'dotnet test $(buildConfiguration)'
+          - script: dotnet pack SodaPop.RazorPagesSiteMap --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+            condition: and(succeeded(), eq(variables.imageName, 'ubuntu-latest'))
+            displayName: 'dotnet pack SodaPop.RazorPagesSiteMap $(buildConfiguration)'   
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: '$(Build.ArtifactStagingDirectory)'
+              artifactName: pack
+
+
+  - stage: "Release"
+    jobs:
+    - deployment: "NugetPublish"
+      dependsOn: ["BuildWindows", "BuildLinux"]
+      condition:  and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/release'))
+      displayName: "Publish to Nuget"
+      environment: "NuGet"
+      pool:
+        vmImage: 'windows-2019'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: NuGetCommand@2
+              displayName: "Push to NuGet"
+              inputs:
+                command: 'push'
+                packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;'
+                nuGetFeedType: 'external'
+                publishFeedCredentials: 'NuGet'   
