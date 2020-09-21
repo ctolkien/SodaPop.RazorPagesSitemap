@@ -37,10 +37,10 @@ stages:
 
 
   - stage: "Release"
+    dependsOn: "Prepare"
+    condition:  and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/release'))
     jobs:
     - deployment: "NugetPublish"
-      dependsOn: "Prepare"
-      condition:  and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/release'))
       displayName: "Publish to Nuget"
       environment: "NuGet"
       pool:
