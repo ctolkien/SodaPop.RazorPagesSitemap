@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace SodaPop.RazorPagesSitemap.Sample
 {
@@ -32,12 +29,12 @@ namespace SodaPop.RazorPagesSitemap.Sample
             {
                 options.IgnoreExpression = @"^\/Error";
             });
-
-            services.AddMvc();
+            services.AddRazorPages();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -50,9 +47,16 @@ namespace SodaPop.RazorPagesSitemap.Sample
 
             app.UseStaticFiles();
 
+            app.UseRouting();
             app.UseRazorPagesSitemap();
 
-            app.UseMvc();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+            });
+
+
         }
     }
 }

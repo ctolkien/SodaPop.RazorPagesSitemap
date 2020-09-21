@@ -2,7 +2,7 @@
 
 namespace SodaPop.RazorPagesSitemap
 {
-    class SiteMapNodeComparer : IEqualityComparer<SitemapNode>
+    internal class SiteMapNodeComparer : IEqualityComparer<SitemapNode>
     {
         public bool Equals(SitemapNode x, SitemapNode y) => x.Url == y.Url;
 
