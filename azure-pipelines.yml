@@ -41,6 +41,18 @@ stages:
     dependsOn: "Prepare"
     condition:  and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/release'))
     jobs:
+    - job: "GitHubRelease"
+      displayName: "GitHub Release"
+      steps:
+        - task: GitHubRelease@1
+          displayName: 'GitHub release (create)'  
+          inputs:  
+            gitHubConnection: ctolkien
+            tagSource: userSpecifiedTag
+            tag: '$(Build.BuildNumber)'
+            title: '$(Build.BuildNumber)'  
+            assets: '**/*.nupkg'  
+            changeLogCompareToRelease: lastNonDraftRelease
     - deployment: "NugetPublish"
       displayName: "Publish to Nuget"
       environment: "NuGet"
