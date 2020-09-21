@@ -27,10 +27,11 @@ stages:
             displayName: 'dotnet build $(buildConfiguration)'
           - script: dotnet test -v n --configuration $(buildConfiguration) -l trx
             displayName: 'dotnet test $(buildConfiguration)'
-          - script: dotnet pack SodaPop.RazorPagesSiteMap --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+          - script: dotnet pack --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
             condition: and(succeeded(), eq(variables.imageName, 'ubuntu-latest'))
-            displayName: 'dotnet pack SodaPop.RazorPagesSiteMap $(buildConfiguration)'   
+            displayName: 'dotnet pack $(buildConfiguration)'   
           - task: PublishBuildArtifacts@1
+            condition: and(succeeded(), eq(variables.imageName, 'ubuntu-latest'))
             inputs:
               pathToPublish: '$(Build.ArtifactStagingDirectory)'
               artifactName: pack
