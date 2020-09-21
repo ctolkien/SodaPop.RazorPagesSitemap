@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using System;
@@ -11,13 +9,15 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Microsoft.AspNetCore.Razor.Language;
+using System.IO;
 
 namespace SodaPop.RazorPagesSitemap
 {
     public class RazorPagesSitemapMiddleware : IMiddleware
     {
         private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
-        private readonly RazorProject _razorProject;
+        private readonly RazorProjectFileSystem _razorProjectFileSystem;
         private readonly RazorPagesSitemapOptions _options;
         private readonly IEnumerable<ISitemapRouteParamProvider> _routeParamProviders;
         private readonly Regex _ignoreExpression;
@@ -25,14 +25,13 @@ namespace SodaPop.RazorPagesSitemap
 
         public RazorPagesSitemapMiddleware(
             IActionDescriptorCollectionProvider actionDescriptors,
-            RazorProject razorProject,
             IOptions<RazorPagesSitemapOptions> options,
             IEnumerable<ISitemapRouteParamProvider> routeParamProviders,
             LinkGenerator linkGenerator)
         {
             _actionDescriptorCollectionProvider = actionDescriptors;
-            _razorProject = razorProject;
             _options = options.Value;
+            _razorProjectFileSystem = RazorProjectFileSystem.Create(_options.RootDirectoryPath);
             _routeParamProviders = routeParamProviders;
 
             if (!string.IsNullOrEmpty(_options.IgnoreExpression))
@@ -57,7 +56,7 @@ namespace SodaPop.RazorPagesSitemap
                     continue;
                 }
 
-                if (_ignoreExpression != null && _ignoreExpression.IsMatch(page.ViewEnginePath))
+                if (_ignoreExpression?.IsMatch(page.ViewEnginePath) == true)
                 {
                     continue;
                 }
@@ -87,9 +86,10 @@ namespace SodaPop.RazorPagesSitemap
                 {
                     if (_options.BaseLastModOnLastModifiedTimeOnDisk)
                     {
-                        if (_razorProject.GetItem(page.RelativePath) is FileProviderRazorProjectItem rpi)
+                        var rpi = _razorProjectFileSystem.GetItem(page.RelativePath, null);
+                        if (rpi.Exists)
                         {
-                            node.LastModified = rpi.FileInfo.LastModified.ToUniversalTime().DateTime;
+                            node.LastModified = new FileInfo(rpi.PhysicalPath).LastWriteTimeUtc;
                         }
                     }
                 }
@@ -107,8 +107,13 @@ namespace SodaPop.RazorPagesSitemap
 
             context.Response.ContentType = "application/xml";
 
+            //writing synchronously to the response body is not supported by asp.net
+            //so we write to a memory stream first, which does support writing back asynchronously
             var serializer = new XmlSerializer(typeof(Sitemap));
-            serializer.Serialize(context.Response.Body, sitemap);
+            using var ms = new MemoryStream();
+            serializer.Serialize(ms, sitemap);
+            ms.Position = 0;
+            await ms.CopyToAsync(context.Response.Body);
         }
     }
 }

@@ -27,9 +27,10 @@ namespace SodaPop.RazorPagesSitemap.Tests
 
             // Act
             var response = await _client.GetAsync("/sitemap.xml");
+            var responseString = await response.Content.ReadAsStringAsync();
+
             response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
             var responseXml = new XmlDocument();
             responseXml.LoadXml(responseString);
 
